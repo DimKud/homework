@@ -20,10 +20,19 @@ def update_task_is_done(number):
 def valid_zapiska_number(number):
     return number.isdigit() and 0 < int(number) <= len(zapiska)  
 
-def yes_zapiska_choice(number, task, action):
-    y = input(f' Вы хотите добавить еще одну задачу? (y/n) ')
-    return y in ('Y', 'y')
-
+def yes_zapiska_choice(func):
+    def wrapper(*arges, **kwargs):
+        while True:
+            result = func(*arges, **kwargs)
+            y = input(f' Вы хотите добавить еще одну задачу? (y/n) ')
+            if y in ('Y', 'y'):
+                continue
+            else:
+                break
+        return result
+    return wrapper
+            
+    
 def add_zapis(text):
     zapis = {
         "text": text,
@@ -45,29 +54,27 @@ def print_zapiska():
         i += 1
     return True
 
+@yes_zapiska_choice
 def print_add_zapis_list():
     while True:
         print_zapiska()
         text = input('Введите новую задачу: ')
         task = add_zapis(text)
-        if not yes_zapiska_choice(len(zapiska), task, 'add'):
-            break
-    return True
+        return 
 
+@yes_zapiska_choice
 def print_update_zapiska_is_done():
     while True:
         print_zapiska()
         number = input('Введите номер задачи которую хотите отметить: ')
         if not valid_zapiska_number(number):
             print('Неверный номер задачи, попробуйте еще раз\n')
-            print_zapiska()
             continue
         number = int(number)
         task = update_task_is_done(number - 1)
-        if not yes_zapiska_choice(number, task, 'mark'):
-            break
-    return True
+        return 
 
+@yes_zapiska_choice
 def print_delete_zapiska():
     while len(zapiska):
         print_zapiska()
@@ -77,11 +84,7 @@ def print_delete_zapiska():
             continue
         number = int(number)
         task = delete_zapis(number - 1)
-        if not yes_zapiska_choice(number, task, 'delete'):
-            break
-    else: 
-        print('Нет списка задач')
-    return True
+        return True
 
 def delete_zapis(number):
     task = zapiska.pop(number)
@@ -98,9 +101,7 @@ def print_update_zapiska():
         number = int(number)
         text = input('Введите текст, на который хотите изменить: ')
         task = update_zapiska_text(number - 1, text)
-        if not yes_zapiska_choice(number, task, 'delete'):
-            break
-    return True
+        return 
 
 
 def my_filter_print():
